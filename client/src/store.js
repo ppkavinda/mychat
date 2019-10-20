@@ -28,21 +28,26 @@ export default new Vuex.Store({
     },
     addPublicMessage(state, message) {
       if (message.meta.type == 'sub') {
-        Vue.set(state.public.users, message.data.username, 1);
-        console.log('sub', message);
-      } else if (message.meta.type == 'unsub') {
-        Vue.delete(state.public.users, message.data.username);
-        console.log('unsub', message);
-        
-      } else if (message.meta.type == 'offline') {
+      //   Vue.set(state.public.users, message.data.username, 1);
+      //   console.log('sub', message);
+
+      // } else if (message.meta.type == 'unsub') {
+      //   Vue.delete(state.public.users, message.data.username);
+      //   console.log('unsub', message);
+
+      } else if (message.meta.type == 'onlineStatus') {
+        if (message.data.online) {
+          Vue.set(state.public.users, message.data.username, 1);
+        } else if (!message.data.online) {
+          Vue.delete(state.public.users, message.data.username);
+        }
         console.log(message);
-      } else if (message.meta.type == 'online') {
-        console.log(message);
+
       } else {
         state.public.messages.push(message);
       }
     }
 
   },
-  actions: { }
+  actions: {}
 })

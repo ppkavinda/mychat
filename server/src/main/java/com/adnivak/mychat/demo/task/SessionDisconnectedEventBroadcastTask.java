@@ -1,6 +1,5 @@
 package com.adnivak.mychat.demo.task;
 
-import com.adnivak.mychat.demo.model.User;
 import com.adnivak.mychat.demo.payload.ApiResponse;
 import com.adnivak.mychat.demo.payload.dto.UserDTO;
 import com.adnivak.mychat.demo.service.UserService;
@@ -22,15 +21,21 @@ public class SessionDisconnectedEventBroadcastTask implements ApplicationListene
     public void onApplicationEvent(SessionDisconnectEvent event) {
         if (event.getUser() != null) {
             String username = event.getUser().getName();
-            userService.setUserOnline(username);
+            userService.setUserOffline(username);
+            UserDTO userDTO = UserDTO.builder().username(username).online(false).build();
+            ApiResponse<UserDTO> response = ApiResponse.ok(userDTO, "onlineStatus");
 
-            UserDTO userDTO = UserDTO.builder().username(username).build();
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-            ApiResponse<UserDTO> response = ApiResponse.ok(userDTO, "online");
+            if (!userService.getUserByUsername(username).isOnline()) {
+                messagingTemplate.convertAndSend("/chat/public", response);
+            }
 
-            messagingTemplate.convertAndSend("/chat/public", response);
-            System.out.println("offline: " + response.getData());
+            System.out.println("offline: " + userService.getUserByUsername(username).isOnline() + " " + response.getData());
         }
-
     }
 }
