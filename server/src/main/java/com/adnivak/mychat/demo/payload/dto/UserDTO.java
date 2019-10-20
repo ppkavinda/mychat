@@ -9,4 +9,5 @@ import lombok.Setter;
 @Builder
 public class UserDTO {
     private String username;
+    private boolean online;
 }
